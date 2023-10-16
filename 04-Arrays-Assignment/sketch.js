@@ -7,6 +7,7 @@
 
 
 // Set the variables
+let spikeArray = [];
 let ball = {
   x: 0,
   y: 0,
@@ -22,12 +23,14 @@ let pos = 100;
 let colors = ["black", "yellow"];
 let timeRN;
 let spikeBall;
+let spawnSpikes;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  spike = makeSpike();
+  makeSpike();
   noStroke();
   spikeBall = loadImage("spikeBall.png");
+  spawnSpikes = setInterval(makeSpike, 2000);
 }
 
 function draw() {
@@ -51,7 +54,7 @@ function makeSpike() {
     dy: 5,
     size: ball.size * 5,
   };
-  return spike;
+  spikeArray.push(spike);
 }
 
 
@@ -69,17 +72,20 @@ function mouseWheel(event) {
 
 // Check if the player ran into the spike
 function checkDeath() {
-  if (
-    ball.x > spike.x &&
-    ball.x < spike.x + spike.size &&
-    ball.y > spike.y &&
-    ball.y < spike.y + spike.size
-  ) {
-    state = "Menu";
-    ball.x = 0;
-    ball.y = 0;
-    spike.x = width / 2;
-    spike.y = height / 2;
+  for (let theSpike of spikeArray) {
+    if (
+      ball.x > theSpike.x &&
+      ball.x < theSpike.x + theSpike.size &&
+      ball.y > theSpike.y &&
+      ball.y < theSpike.y + theSpike.size
+    ) {
+      state = "Menu";
+      ball.x = 0;
+      ball.y = 0;
+      theSpike.x = width / 2;
+      theSpike.y = height / 2;
+      spikeArray = [];
+    }
   }
 }
 
@@ -183,29 +189,35 @@ function keyPressed() {
       ball.dy += 75;
     }
   }
+  if (keyCode === 38) {
+    clearInterval(spawnSpikes);
+    spawnSpikes = null;
+  }
 }
 
 // Call the functions to make the spikeball work properly
 function bouncingSpike() {
-  moveBall();
-  displayBall();
-  bounceIfWall();
+  for (let theSpike of spikeArray) {
+    moveBall(theSpike);
+    displayBall(theSpike);
+    bounceIfWall(theSpike);
+  }
 }
 
 // Change the spike coordinates
-function moveBall() {
-  spike.x += spike.dx;
-  spike.y += spike.dy;
+function moveBall(theSpike) {
+  theSpike.x += theSpike.dx;
+  theSpike.y += theSpike.dy;
 }
 
 // Show the spike moving
-function displayBall() {
+function displayBall(theSpike) {
   imageMode(CORNER);
-  image(spikeBall, spike.x, spike.y, spike.size, spike.size);
+  image(spikeBall, theSpike.x, theSpike.y, theSpike.size, theSpike.size);
 }
 
 // Bounce if it touches the wall
-function bounceIfWall() {
+function bounceIfWall(spike) {
   if (spike.x + spike.size >= width || spike.x <= 0) {
     spike.dx = spike.dx * -1;
   }
