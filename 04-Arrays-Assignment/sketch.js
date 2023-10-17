@@ -3,7 +3,7 @@
 // 10/10/2023
 //
 // Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// - clearInterval() was used to stop too many spikes from appearing.
 
 
 // Set the variables
@@ -40,6 +40,7 @@ function draw() {
     circleBorders();
     bouncingSpike();
     checkDeath();
+    checkTheNumOfSpikes();
   }
   else {
     mainMenu();
@@ -50,8 +51,8 @@ function makeSpike() {
   spike = {
     x: width/2,
     y: height/2,
-    dx: 5,
-    dy: 5,
+    dx: random([-5, 5, -4, 4, -6, 6]),
+    dy: random([-5, 5, -4, 4, -6, 6]),
     size: ball.size * 5,
   };
   spikeArray.push(spike);
@@ -189,10 +190,14 @@ function keyPressed() {
       ball.dy += 75;
     }
   }
-  if (keyCode === 38) {
+}
+
+// Amount of spikes cap at 10
+function checkTheNumOfSpikes() {
+  if (spikeArray.length > 9) {
     clearInterval(spawnSpikes);
     spawnSpikes = null;
-  }
+  } 
 }
 
 // Call the functions to make the spikeball work properly
