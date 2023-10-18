@@ -14,22 +14,27 @@ let ball = {
   dx: 5,
   dy: 5,
   size: 30,
+  color: "orange",
 };
 let spike;
 let state = "Menu";
-let time;
 let backgroundColors = ["blue", "white", "yellow", "gray", "green", "cyan", "pink", "purple", "black"];
 let pos = 100;
 let colors = ["black", "yellow"];
-let timeRN;
 let spikeBall;
-let spawnSpikes;
+let spawnSpikes; 
+let mode = "normal";
+let lives = 3;
+let invincible = false;
+let timeRN;
+let heart;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   makeSpike();
   noStroke();
   spikeBall = loadImage("spikeBall.png");
+  heart = loadImage("heart.png");
   spawnSpikes = setInterval(makeSpike, 2000);
 }
 
@@ -41,6 +46,8 @@ function draw() {
     bouncingSpike();
     checkDeath();
     checkTheNumOfSpikes();
+    checkInvincibility();
+    showLives();
   }
   else {
     mainMenu();
@@ -58,7 +65,13 @@ function makeSpike() {
   spikeArray.push(spike);
 }
 
-
+function checkInvincibility() {
+  if (invincible === true) {
+    if (millis() > timeRN) {
+      invincible = false;
+    }
+  }
+}
 
 // Increase (pos) with the mousewheel which changes color
 function mouseWheel(event) {
@@ -78,15 +91,28 @@ function checkDeath() {
       ball.x > theSpike.x &&
       ball.x < theSpike.x + theSpike.size &&
       ball.y > theSpike.y &&
-      ball.y < theSpike.y + theSpike.size
+      ball.y < theSpike.y + theSpike.size &&
+      invincible === false
     ) {
-      state = "Menu";
-      ball.x = 0;
-      ball.y = 0;
-      theSpike.x = width / 2;
-      theSpike.y = height / 2;
-      spikeArray = [];
+      lives -= 1;
+      invincible = true;
+      timeRN = millis() + 2000;
+      if (lives === 0) {
+        state = "Menu";
+        ball.x = 0;
+        ball.y = 0;
+        theSpike.x = width / 2;
+        theSpike.y = height / 2;
+        spikeArray = [];
+        lives = 3;
+      }
     }
+  }
+}
+
+function showLives() {
+  for (let i = 0; i !== lives * 50; i += 50) {
+    image(heart, i, 0, heart.width * 2, heart.height * 2);
   }
 }
 
@@ -243,12 +269,6 @@ function mousePressed() {
   mouseY <  height - (height / 4 + height / 8) &&
   mouseY > height / 4 + height / 8
   ) {
-    colors = ["black", "yellow"];
-    if (mouseIsPressed) {
-      state = "Game";
-    }
+    state = "Game";
   } 
-  else {
-    colors = ["yellow", "black"];
-  }
 }
