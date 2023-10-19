@@ -4,6 +4,7 @@
 //
 // Extra for Experts:
 // - clearInterval() was used to stop too many spikes from appearing.
+// - adding a certain amount of images and changing the amount with a for loop (showLives() function).
 
 
 // Set the variables
@@ -18,12 +19,11 @@ let ball = {
 };
 let spike;
 let state = "Menu";
-let backgroundColors = ["blue", "white", "yellow", "gray", "green", "cyan", "pink", "purple", "black"];
+let backgroundColors = ["blue", "white", "yellow", "gray", "indigo", "cyan", "pink", "purple", "black"];
 let pos = 100;
 let colors = ["black", "yellow"];
 let spikeBall;
 let spawnSpikes; 
-let mode = "normal";
 let lives = 3;
 let invincible = false;
 let timeRN;
@@ -39,7 +39,7 @@ function setup() {
 }
 
 function draw() {
-  background(backgroundColors[pos / 100]);
+  background(backgroundColors[pos / 100]); // Background color changes according to the mouse wheel
   if (state === "Game") {
     display();
     circleBorders();
@@ -54,21 +54,24 @@ function draw() {
   }
 }
 
+// Creates a single spike and pushes it into the spike array
 function makeSpike() {
   spike = {
     x: width/2,
     y: height/2,
     dx: random([-5, 5, -4, 4, -6, 6]),
     dy: random([-5, 5, -4, 4, -6, 6]),
-    size: ball.size * 5,
+    size: ball.size * random(2, 6),
   };
   spikeArray.push(spike);
 }
 
+// Turn off invincibility after a certain amount of time
 function checkInvincibility() {
   if (invincible === true) {
     if (millis() > timeRN) {
       invincible = false;
+      ball.color = "orange";
     }
   }
 }
@@ -84,7 +87,7 @@ function mouseWheel(event) {
   }
 }
 
-// Check if the player ran into the spike
+// Check if the player ran into the spike and take away lives if they do
 function checkDeath() {
   for (let theSpike of spikeArray) {
     if (
@@ -96,6 +99,7 @@ function checkDeath() {
     ) {
       lives -= 1;
       invincible = true;
+      ball.color = "green";
       timeRN = millis() + 2000;
       if (lives === 0) {
         state = "Menu";
@@ -103,13 +107,14 @@ function checkDeath() {
         ball.y = 0;
         theSpike.x = width / 2;
         theSpike.y = height / 2;
-        spikeArray = [];
         lives = 3;
+        ball.color = "orange";
       }
     }
   }
 }
 
+// Show the amoung of lives the player has currently
 function showLives() {
   for (let i = 0; i !== lives * 50; i += 50) {
     image(heart, i, 0, heart.width * 2, heart.height * 2);
@@ -145,7 +150,7 @@ function display() {
   rect(0, 0, width, height / 20);
   rect(width - width / 20, 0, width / 20, height);
   rect(0, height - height / 20, width, height - height / 20);
-  fill(255, 165, 0);
+  fill(ball.color);
   circle(ball.x, ball.y, ball.size);
 }
 
@@ -166,10 +171,16 @@ function moveCircle() {
   resetSpeed();
 }
 
-// Set speed to 5
+// Increase speed if you get hit but set it to 5 if you're not hit
 function resetSpeed() {
-  ball.dx = 5;
-  ball.dy = 5;
+  if (invincible) {
+    ball.dx = 10;
+    ball.dy = 10;
+  }
+  else {
+    ball.dx = 5;
+    ball.dy = 5;
+  }
 }
 
 // Stop the movement if the circle gets to a boarder
@@ -263,6 +274,7 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
 
+// If the player clicks the play button take away all spikes, set invincibility to false and start the game
 function mousePressed() {
   if (mouseX > width / 4 + width / 8 &&
   mouseX < width - (width / 4 + width / 8) &&
@@ -270,5 +282,7 @@ function mousePressed() {
   mouseY > height / 4 + height / 8
   ) {
     state = "Game";
+    spikeArray = [];
+    invincible = false;
   } 
 }
