@@ -8,6 +8,7 @@
 - [Sounds and Images](07-sound-image)
 - [Terrain Generatio](08-terrain)
 - [Draw a Grid](09-2d-grid)
+- [Grid Neighbours](10-neighbours)
 
 ## Projects
 - [Interactive Scene](02-Scene)
