@@ -1,11 +1,9 @@
 // 2D Array Grid
 // Oct 24, 2023
 
-// let grid = [[1, 0, 0, 1], [0, 0, 1, 1], [1, 1, 0, 1], [0, 1, 1, 1]];
 let grid;
 let cellSize;
-const GRID_SIZE = 10;
-let ax;
+const GRID_SIZE = 3;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -21,6 +19,18 @@ function setup() {
 function draw() {
   background(220);
   displayGrid();
+}
+
+function mousePressed() {
+  let y = Math.floor(mouseY/cellSize);
+  let x = Math.floor(mouseX/cellSize);
+
+  if (grid[y][x] === 0) {
+    grid[y][x] = 1;
+  }
+  else if (grid[y][x] === 1) {
+    grid[y][x] = 0;
+  }
 }
 
 function keyTyped() {
