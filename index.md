@@ -15,4 +15,4 @@
 ## Projects
 - [Interactive Scene](02-Scene)
 - [Arrays/Objects Assignment](04-Arrays-Assignment)
-- [2D Grid Assignment](12-2D-Grid)
+- [2D Grid Assignment](12-2D-Grid-Assignment)
