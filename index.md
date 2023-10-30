@@ -10,6 +10,7 @@
 - [Draw a Grid](09-2d-grid)
 - [Grid Neighbours](10-neighbours)
 - [Game of Life](11-game-of-life)
+- [Character in Grid](13-character-in-grid)
 
 ## Projects
 - [Interactive Scene](02-Scene)
