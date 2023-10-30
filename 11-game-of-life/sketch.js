@@ -1,10 +1,14 @@
 // Game of Life
-// Oct 26, 2023
 
 let grid;
+const GRID_SIZE = 40;
 let cellSize;
-const GRID_SIZE = 30;
-let autoPlay = false;
+let autoPlay = true;
+let gosperGun;
+
+function preload() {
+  gosperGun = loadJSON("gosper-gun.json");
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -21,7 +25,7 @@ function setup() {
 function draw() {
   background(220);
   if (autoPlay && frameCount % 10 === 0) {
-    grid = nextTurn;
+    grid = nextTurn();
   }
   displayGrid();
 }
@@ -39,50 +43,53 @@ function keyTyped() {
   else if (key === "a") {
     autoPlay = !autoPlay;
   }
+  else if (key === "g") {
+    grid = gosperGun;
+  }
 }
 
 function nextTurn() {
   let nextTurnGrid = generateEmptyGrid(GRID_SIZE, GRID_SIZE);
 
-  // look at every cell
+  //look at every cell
   for (let y = 0; y < GRID_SIZE; y++) {
     for (let x = 0; x < GRID_SIZE; x++) {
-      // count neighbours
+      //count neighbours
       let neighbours = 0;
 
-      // look at all cells around in a 3x3 grid
+      //look at all cells around in a 3x3 grid
       for (let i = -1; i <= 1; i++) {
         for (let j = -1; j <= 1; j++) {
-          // detect edge cases
+          //detect edge cases
           if (y+i >= 0 && y+i < GRID_SIZE && x+j >= 0 && x+j < GRID_SIZE) {
             neighbours += grid[y+i][x+j];
           }
         }
       }
       
-      // be careful about counting self
+      //be careful about counting self
       neighbours -= grid[y][x];
 
-      // apply the rules
-      if (grid[y][x] === 1) {    // alive
-        if (neighbours === 2 || neighbours === 3) {    
-          // stay alive
+      //apply rules
+      if (grid[y][x] === 1) { //alive
+        if (neighbours === 2 || neighbours === 3) {
+          //stay alive
           nextTurnGrid[y][x] = 1;
         }
         else {
-          // died - lonely or overpopulation
+          //died - lonely or overpopulation
           nextTurnGrid[y][x] = 0;
         }
       }
 
-      if (grid[y][x] === 0) {    // dead
+      if (grid[y][x] === 0) { //dead
         if (neighbours === 3) {
-          // new birth
-          nextTurnGrid[y][x] === 1;
+          //new birth
+          nextTurnGrid[y][x] = 1;
         }
         else {
-          // stay dead
-          nextTurnGrid[y][x] === 0;
+          //stay dead
+          nextTurnGrid[y][x] = 0;
         }
       }
     }
@@ -94,11 +101,12 @@ function mousePressed() {
   let y = Math.floor(mouseY/cellSize);
   let x = Math.floor(mouseX/cellSize);
 
-  toggleCell(x, y); //current cell
+  toggleCell(x, y);   //current cell
 }
 
 function toggleCell(x, y) {
-  if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {     // check that we are within the grid, then toggle
+  //check that we are within the grid, then toggle
+  if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
     if (grid[y][x] === 0) {
       grid[y][x] = 1;
     }
@@ -117,34 +125,34 @@ function displayGrid() {
       else if (grid[y][x] === 1) {
         fill("black");
       }
-      rect(x * cellSize, y * cellSize, cellSize, cellSize);
+      rect(x*cellSize, y*cellSize, cellSize, cellSize);
     }
   }
 }
 
 function generateRandomGrid(cols, rows) {
-  let randomGrid = [];
+  let newGrid = [];
   for (let y = 0; y < rows; y++) {
-    randomGrid.push([]);
+    newGrid.push([]);
     for (let x = 0; x < cols; x++) {
-      if (random(0, 100) < 50) {
-        randomGrid[y].push(0);
+      if (random(100) < 50) {
+        newGrid[y].push(0);
       }
       else {
-        randomGrid[y].push(1);
+        newGrid[y].push(1);
       }
     }
   }
-  return randomGrid;
+  return newGrid;
 }
 
 function generateEmptyGrid(cols, rows) {
-  let randomGrid = [];
+  let newGrid = [];
   for (let y = 0; y < rows; y++) {
-    randomGrid.push([]);
+    newGrid.push([]);
     for (let x = 0; x < cols; x++) {
-      randomGrid[y].push(0);
+      newGrid[y].push(0);
     }
   }
-  return randomGrid;
+  return newGrid;
 }
