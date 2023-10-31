@@ -3,7 +3,8 @@
 // Oct 27, 2023
 //
 // Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// - Used text font
+// - Used setTimeout() function to change the grid number to 4 after a bit of time has passed
 
 let grid;
 let cellSize;
@@ -41,12 +42,21 @@ function draw() {
   livesSystem();
 }
 
+function gameOver() {
+  textSize(750/GRID_SIZE);
+  text("Game Over!", 0, GRID_SIZE/2*cellSize, cellSize * GRID_SIZE, cellSize);
+  player.color = "orange";
+}
+
 function livesSystem() {
-  if (grid[player.y][player.x] === 1 && player.iFrame === false) {
+  if (grid[player.y][player.x] === 4 && player.iFrame === false && player.lives > 0) {
     player.lives -= 1;
     player.iFrame = true;
     player.iFrameTimer = millis() + 2000;
     player.color = "green";
+  }
+  if (player.lives <= 0) {
+    gameOver();
   }
   if (millis() > player.iFrameTimer) {
     player.iFrame = false;
@@ -70,23 +80,23 @@ function displayPlayer() {
     fill("red");
   }
 
-  textFont("Courier New", 35);
+  textFont("Courier New", 40 - GRID_SIZE);
   textStyle(BOLD);
   text(player.lives, player.x * cellSize + cellSize/2, player.y * cellSize + cellSize/2, player.size, player.size);
   rectMode(CORNER);
 }
 
 function keyTyped() {
-  if (key === "s" && player.y < GRID_SIZE - 1) {
+  if (key === "s" && player.y < GRID_SIZE - 1 && player.lives > 0) {
     player.y = player.y + 1;
   }
-  if (key === "w" && player.y > 0) {
+  if (key === "w" && player.y > 0 && player.lives > 0) {
     player.y = player.y - 1;
   }
-  if (key === "d" && player.x < GRID_SIZE - 1) {
+  if (key === "d" && player.x < GRID_SIZE - 1 && player.lives > 0) {
     player.x = player.x + 1;
   }
-  if (key === "a" && player.x > 0) {
+  if (key === "a" && player.x > 0 && player.lives > 0) {
     player.x = player.x - 1;
   }
 }
@@ -98,7 +108,7 @@ function mousePressed() {
   if (grid[y][x] === 0) {
     grid[y][x] = 1;
   }
-  else if (grid[y][x] === 1) {
+  else if (grid[y][x] === 4) {
     grid[y][x] = 0;
   }
 }
@@ -110,9 +120,16 @@ function displayGrid() {
         fill(41,34,57);
       }
       if (grid[y][x] === 1) {
-        fill(255,159,239);
-        fill(254,31,111);
+        fill(170, 21, 87);
+        rect(x * cellSize, y * cellSize, cellSize, cellSize);
+        // grid[y][x] = 4;
+        setTimeout(() => {
+          grid[y][x] = 4; 
+        }, 1000);
       }
+      if (grid[y][x] === 4) {
+        fill(253, 31, 108);
+      } 
       rect(x * cellSize, y * cellSize, cellSize, cellSize);
     }
   }
