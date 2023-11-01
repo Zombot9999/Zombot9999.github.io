@@ -457,7 +457,9 @@
       "collidePolyPoly": true,
       "collidePointTriangle": true,
 
-      "deltaTime": true
+      "deltaTime": true,
+      "textWrap": true,
+      "WORD": true
     }
   }
 }

@@ -3,23 +3,29 @@
 // Oct 27, 2023
 //
 // Extra for Experts:
-// - Used text font
+// - Used textFont()
 // - Used setTimeout() function to change the grid number to 4 after a bit of time has passed
 
 let grid;
-let cellSize;
-const GRID_SIZE = 10;
+let cellSize = 75;
+let rows;
+let columns; 
+// const GRID_SIZE = 10;
 let player;
+let linesAttack = false;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
-  if (height > width) {
-    cellSize = width/GRID_SIZE;
-  }
-  else {
-    cellSize = height/GRID_SIZE;
-  }
+  // if (height > width) {
+  //   cellSize = width/GRID_SIZE;
+  // }
+  // else {
+  //   cellSize = height/GRID_SIZE;
+  // }
+
+  columns = floor(windowHeight/cellSize);
+  rows = floor(windowWidth/cellSize);
 
   player = {
     x: 0,
@@ -29,10 +35,10 @@ function setup() {
     lives: 3,
     iFrame: false,
     iFrameTimer: 0,
-    color: "orange",
+    color: "cyan",
   };
 
-  grid = makeEmptyGrid(GRID_SIZE, GRID_SIZE);
+  grid = makeEmptyGrid(columns, rows);
 }
 
 function draw() {
@@ -40,12 +46,33 @@ function draw() {
   displayGrid();
   displayPlayer();
   livesSystem();
+  spawnOnPlayer();
+  // spawnLines();
+}
+
+// function spawnLines() {
+//   while (linesAttack) {
+//     let x = random(rows);
+//     for (let y = 0; y < columns; y++) {
+//       setTimeout(() => {
+//         grid[x][y] = 1; 
+//       }, 1000);
+//     }
+//   }
+// }
+
+function spawnOnPlayer() {
+  if (grid[player.y][player.x] === 0) {
+    grid[player.y][player.x] = 1;
+  }
 }
 
 function gameOver() {
-  textSize(750/GRID_SIZE);
-  text("Game Over!", 0, GRID_SIZE/2*cellSize, cellSize * GRID_SIZE, cellSize);
-  player.color = "orange";
+  textSize(750/columns);
+  fill("white");
+  textWrap(WORD);
+  text("Game Over!", 5 * cellSize, 5 * cellSize, cellSize * 10, cellSize);
+  player.color = "cyan";
 }
 
 function livesSystem() {
@@ -53,18 +80,19 @@ function livesSystem() {
     player.lives -= 1;
     player.iFrame = true;
     player.iFrameTimer = millis() + 2000;
-    player.color = "green";
+    player.color = "blue";
   }
   if (player.lives <= 0) {
     gameOver();
   }
   if (millis() > player.iFrameTimer) {
     player.iFrame = false;
-    player.color = "orange";
+    player.color = "cyan";
   }
 }
 
 function displayPlayer() {
+  noStroke();
   rectMode(CENTER);
   textAlign(CENTER);
   fill(player.color);
@@ -79,25 +107,31 @@ function displayPlayer() {
   else {
     fill("red");
   }
-
-  textFont("Courier New", 40 - GRID_SIZE);
+  stroke(5);
+  textFont("Courier New", 40 - columns);
   textStyle(BOLD);
   text(player.lives, player.x * cellSize + cellSize/2, player.y * cellSize + cellSize/2, player.size, player.size);
   rectMode(CORNER);
 }
 
 function keyTyped() {
-  if (key === "s" && player.y < GRID_SIZE - 1 && player.lives > 0) {
+  // Player movement
+  if (key === "s" && player.y < columns - 1 && player.lives > 0) {
     player.y = player.y + 1;
   }
   if (key === "w" && player.y > 0 && player.lives > 0) {
     player.y = player.y - 1;
   }
-  if (key === "d" && player.x < GRID_SIZE - 1 && player.lives > 0) {
+  if (key === "d" && player.x < rows - 1 && player.lives > 0) {
     player.x = player.x + 1;
   }
   if (key === "a" && player.x > 0 && player.lives > 0) {
     player.x = player.x - 1;
+  }
+
+  // Other functions
+  if (key === "l") {
+    linesAttack = true;
   }
 }
 
@@ -114,8 +148,8 @@ function mousePressed() {
 }
 
 function displayGrid() {
-  for (let y = 0; y < GRID_SIZE; y++) {
-    for (let x = 0; x < GRID_SIZE; x++) {
+  for (let y = 0; y < columns; y++) {
+    for (let x = 0; x < rows; x++) {
       if (grid[y][x] === 0) {
         fill(41,34,57);
       }
