@@ -31,8 +31,8 @@ function setup() {
     x: 0,
     y: 0,
     size: cellSize/2,
-    livesMax: 3,
-    lives: 3,
+    livesMax: 100,
+    lives: 100,
     iFrame: false,
     iFrameTimer: 0,
     color: "cyan",
@@ -47,19 +47,22 @@ function draw() {
   displayPlayer();
   livesSystem();
   spawnOnPlayer();
-  // spawnLines();
+  if (linesAttack) {
+    setTimeout(() => {
+      spawnLines; 
+    }, 1000);
+  }  
 }
 
-// function spawnLines() {
-//   while (linesAttack) {
-//     let x = random(rows);
-//     for (let y = 0; y < columns; y++) {
-//       setTimeout(() => {
-//         grid[x][y] = 1; 
-//       }, 1000);
-//     }
-//   }
-// }
+function spawnLines() {
+  let lineX = random(rows);
+  for (let lineY = 0; lineY < columns; lineY++) {
+    setTimeout(() => {
+      grid[lineY][lineX] = 1; 
+    }, 1000);
+  }
+}
+
 
 function spawnOnPlayer() {
   if (grid[player.y][player.x] === 0) {
@@ -130,8 +133,8 @@ function keyTyped() {
   }
 
   // Other functions
-  if (key === "l") {
-    linesAttack = true;
+  if (key === " ") {
+    linesAttack = !linesAttack;
   }
 }
 
