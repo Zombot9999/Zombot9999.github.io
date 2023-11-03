@@ -10,20 +10,23 @@ let grid;
 let cellSize = 75;
 let rows;
 let columns; 
-// const GRID_SIZE = 10;
 let player;
 let linesAttack = false;
 
+// Variables for spawnLinesYAxis() and spawnLinesXAxis()
+let spawnLinesYTimer = 0;
+let spawnLinesXTimer = 0;
+let spawnLinesX = 0;
+let spawnLinesY = 0;
+
+
+// Variables for spawnOnPlayer() 
+let spawnOnPlayerY = 0;
+let spawnOnPlayerX = 0;
+let spawnOnPlayerTimer = 0;
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
-
-  // if (height > width) {
-  //   cellSize = width/GRID_SIZE;
-  // }
-  // else {
-  //   cellSize = height/GRID_SIZE;
-  // }
-
   columns = floor(windowHeight/cellSize);
   rows = floor(windowWidth/cellSize);
 
@@ -47,26 +50,50 @@ function draw() {
   displayPlayer();
   livesSystem();
   spawnOnPlayer();
-  if (linesAttack) {
-    setTimeout(() => {
-      spawnLines; 
-    }, 1000);
-  }  
+  spawnLinesYAxis(); 
+  spawnLinesXAxis();
 }
 
-function spawnLines() {
-  let lineX = random(rows);
-  for (let lineY = 0; lineY < columns; lineY++) {
-    setTimeout(() => {
-      grid[lineY][lineX] = 1; 
-    }, 1000);
+function spawnLinesYAxis() {
+  if (linesAttack && millis() > spawnLinesYTimer) {
+    spawnLinesYTimer = millis() + 3000;
+    for (let lineY = 0; lineY < columns; lineY++) {
+      grid[lineY][spawnLinesX] = 0; 
+    }
+    spawnLinesX = floor(random(0, rows));
+    for (let lineY = 0; lineY < columns; lineY++) {
+      setTimeout(() => {
+        grid[lineY][spawnLinesX] = 1;
+        console.log(lineY, spawnLinesX); 
+      }, 100);
+    }
   }
 }
 
+function spawnLinesXAxis() {
+  if (linesAttack && millis() > spawnLinesXTimer) {
+    spawnLinesXTimer = millis() + 3000;
+    for (let lineX = 0; lineX < rows; lineX++) {
+      grid[spawnLinesY][lineX] = 0; 
+    }
+    spawnLinesY = floor(random(0, columns));
+    for (let lineX = 0; lineX < rows; lineX++) {
+      setTimeout(() => {
+        grid[spawnLinesY][lineX] = 1; 
+      }, 100);
+    }
+  }
+}
 
 function spawnOnPlayer() {
-  if (grid[player.y][player.x] === 0) {
-    grid[player.y][player.x] = 1;
+  if (spawnOnPlayerTimer < millis()) {
+    grid[spawnOnPlayerY][spawnOnPlayerX] = 0;
+    spawnOnPlayerX = player.x;
+    spawnOnPlayerY = player.y;
+  }
+  if (grid[spawnOnPlayerY][spawnOnPlayerX] === 0) {
+    grid[spawnOnPlayerY][spawnOnPlayerX] = 1;
+    spawnOnPlayerTimer = millis() + 2500;
   }
 }
 
@@ -162,7 +189,7 @@ function displayGrid() {
         // grid[y][x] = 4;
         setTimeout(() => {
           grid[y][x] = 4; 
-        }, 1000);
+        }, 500);
       }
       if (grid[y][x] === 4) {
         fill(253, 31, 108);
