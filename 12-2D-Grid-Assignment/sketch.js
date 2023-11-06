@@ -40,7 +40,7 @@ function setup() {
     iFrameTimer: 0,
     color: "cyan",
   };
-
+  
   grid = makeEmptyGrid(columns, rows);
 }
 
@@ -52,6 +52,7 @@ function draw() {
   spawnOnPlayer();
   spawnLinesYAxis(); 
   spawnLinesXAxis();
+  console.log(grid[0]);
 }
 
 function spawnLinesYAxis() {
@@ -86,14 +87,14 @@ function spawnLinesXAxis() {
 }
 
 function spawnOnPlayer() {
-  if (spawnOnPlayerTimer < millis()) {
-    grid[spawnOnPlayerY][spawnOnPlayerX] = 0;
-    spawnOnPlayerX = player.x;
-    spawnOnPlayerY = player.y;
-  }
+  // if (spawnOnPlayerTimer < millis()) {
+  //   grid[spawnOnPlayerY][spawnOnPlayerX] = 0;
+  spawnOnPlayerX = player.x;
+  spawnOnPlayerY = player.y;
+  // }
   if (grid[spawnOnPlayerY][spawnOnPlayerX] === 0) {
     grid[spawnOnPlayerY][spawnOnPlayerX] = 1;
-    spawnOnPlayerTimer = millis() + 2500;
+    // spawnOnPlayerTimer = millis() + 2500;
   }
 }
 
@@ -180,20 +181,24 @@ function mousePressed() {
 function displayGrid() {
   for (let y = 0; y < columns; y++) {
     for (let x = 0; x < rows; x++) {
-      if (grid[y][x] === 0) {
-        fill(41,34,57);
-      }
       if (grid[y][x] === 1) {
         fill(170, 21, 87);
         rect(x * cellSize, y * cellSize, cellSize, cellSize);
-        // grid[y][x] = 4;
         setTimeout(() => {
           grid[y][x] = 4; 
         }, 500);
       }
       if (grid[y][x] === 4) {
+        // fill(253, 31, 108);
         fill(253, 31, 108);
-      } 
+        rect(x * cellSize, y * cellSize, cellSize, cellSize);
+        setTimeout(() => {
+          grid[y][x] = 0; 
+        }, 7000);
+      }
+      if (grid[y][x] === 0) {
+        fill(41,34,57);
+      }
       rect(x * cellSize, y * cellSize, cellSize, cellSize);
     }
   }
