@@ -3,28 +3,31 @@
 // Oct 27, 2023
 //
 // Extra for Experts:
+// - Used setTimeout() function
 // - Used textFont()
-// - Used setTimeout() function to change the grid number to 4 after a bit of time has passed
 
+// General Variables
 let grid;
 let cellSize = 75;
 let rows;
 let columns; 
 let player;
-let linesAttack = false;
 
 // Variables for spawnLinesYAxis() and spawnLinesXAxis()
+let linesAttackY = false;
+let linesAttackX = false;
 let spawnLinesYTimer = 0;
 let spawnLinesXTimer = 0;
 let spawnLinesX = 0;
 let spawnLinesY = 0;
 
-
 // Variables for spawnOnPlayer() 
+let spawnPlayer = false;
 let spawnOnPlayerY = 0;
 let spawnOnPlayerX = 0;
 let spawnOnPlayerTimer = 0;
 
+// Create canvas, set variables and make an empty grid
 function setup() {
   createCanvas(windowWidth, windowHeight);
   columns = floor(windowHeight/cellSize);
@@ -34,7 +37,7 @@ function setup() {
     x: 0,
     y: 0,
     size: cellSize/2,
-    livesMax: 100,
+    livesMax: 3,
     lives: 100,
     iFrame: false,
     iFrameTimer: 0,
@@ -52,12 +55,12 @@ function draw() {
   spawnOnPlayer();
   spawnLinesYAxis(); 
   spawnLinesXAxis();
-  console.log(grid[0]);
 }
 
+// Spawns vertical lines going from top to botton in a random x spot
 function spawnLinesYAxis() {
-  if (linesAttack && millis() > spawnLinesYTimer) {
-    spawnLinesYTimer = millis() + 3000;
+  if (linesAttackY && millis() > spawnLinesYTimer) {
+    spawnLinesYTimer = millis() + 4500;
     for (let lineY = 0; lineY < columns; lineY++) {
       grid[lineY][spawnLinesX] = 0; 
     }
@@ -66,14 +69,15 @@ function spawnLinesYAxis() {
       setTimeout(() => {
         grid[lineY][spawnLinesX] = 1;
         console.log(lineY, spawnLinesX); 
-      }, 100);
+      }, 100 * lineY);
     }
   }
 }
 
+// Spawns horizontal lines going from left to right in a random y spot
 function spawnLinesXAxis() {
-  if (linesAttack && millis() > spawnLinesXTimer) {
-    spawnLinesXTimer = millis() + 3000;
+  if (linesAttackX && millis() > spawnLinesXTimer) {
+    spawnLinesXTimer = millis() + 4500;
     for (let lineX = 0; lineX < rows; lineX++) {
       grid[spawnLinesY][lineX] = 0; 
     }
@@ -81,23 +85,24 @@ function spawnLinesXAxis() {
     for (let lineX = 0; lineX < rows; lineX++) {
       setTimeout(() => {
         grid[spawnLinesY][lineX] = 1; 
-      }, 100);
+      }, 100 * lineX);
     }
   }
 }
 
+// Spawns a kill block on the player
 function spawnOnPlayer() {
-  // if (spawnOnPlayerTimer < millis()) {
-  //   grid[spawnOnPlayerY][spawnOnPlayerX] = 0;
-  spawnOnPlayerX = player.x;
-  spawnOnPlayerY = player.y;
-  // }
-  if (grid[spawnOnPlayerY][spawnOnPlayerX] === 0) {
-    grid[spawnOnPlayerY][spawnOnPlayerX] = 1;
-    // spawnOnPlayerTimer = millis() + 2500;
+  if (spawnPlayer) {
+    spawnOnPlayerX = player.x;
+    spawnOnPlayerY = player.y;
+
+    if (grid[spawnOnPlayerY][spawnOnPlayerX] === 0) {
+      grid[spawnOnPlayerY][spawnOnPlayerX] = 1;
+    }
   }
 }
 
+// Display game over
 function gameOver() {
   textSize(750/columns);
   fill("white");
@@ -106,8 +111,9 @@ function gameOver() {
   player.color = "cyan";
 }
 
+// Check if the player has died and reduce lives
 function livesSystem() {
-  if (grid[player.y][player.x] === 4 && player.iFrame === false && player.lives > 0) {
+  if ((grid[player.y][player.x] === 4 || grid[player.y][player.x] === 4.5) && player.iFrame === false && player.lives > 0) {
     player.lives -= 1;
     player.iFrame = true;
     player.iFrameTimer = millis() + 2000;
@@ -122,6 +128,7 @@ function livesSystem() {
   }
 }
 
+// Display the player and their lives
 function displayPlayer() {
   noStroke();
   rectMode(CENTER);
@@ -145,6 +152,7 @@ function displayPlayer() {
   rectMode(CORNER);
 }
 
+// Key type functions
 function keyTyped() {
   // Player movement
   if (key === "s" && player.y < columns - 1 && player.lives > 0) {
@@ -161,11 +169,18 @@ function keyTyped() {
   }
 
   // Other functions
-  if (key === " ") {
-    linesAttack = !linesAttack;
+  if (key === "v") {
+    linesAttackY = !linesAttackY;
+  }
+  if (key === "h") {
+    linesAttackX = !linesAttackX;
+  }
+  if (key === "p") {
+    spawnPlayer = !spawnPlayer;
   }
 }
 
+// Change a block when it's clicked on
 function mousePressed() {
   let y = Math.floor(mouseY/cellSize);
   let x = Math.floor(mouseX/cellSize);
@@ -178,23 +193,35 @@ function mousePressed() {
   }
 }
 
+// Display the grid and change their values 
 function displayGrid() {
   for (let y = 0; y < columns; y++) {
     for (let x = 0; x < rows; x++) {
-      if (grid[y][x] === 1) {
+      if (grid[y][x] === 1) {   
+        grid[y][x] = 1.5;
         fill(170, 21, 87);
         rect(x * cellSize, y * cellSize, cellSize, cellSize);
         setTimeout(() => {
           grid[y][x] = 4; 
         }, 500);
       }
+      // Value 1.5 is similar to one and prevents the setTimeout() from happening more than once
+      if (grid[y][x] === 1.5) {
+        fill(170, 21, 87);
+        rect(x * cellSize, y * cellSize, cellSize, cellSize);
+      }
       if (grid[y][x] === 4) {
-        // fill(253, 31, 108);
+        grid[y][x] = 4.5;
         fill(253, 31, 108);
         rect(x * cellSize, y * cellSize, cellSize, cellSize);
         setTimeout(() => {
           grid[y][x] = 0; 
-        }, 7000);
+        }, 2000);
+      }
+      // Value 4.5 is similar to one and prevents the setTimeout() from happening more than once
+      if (grid[y][x] === 4.5) {
+        fill(253, 31, 108);
+        rect(x * cellSize, y * cellSize, cellSize, cellSize);
       }
       if (grid[y][x] === 0) {
         fill(41,34,57);
@@ -204,6 +231,7 @@ function displayGrid() {
   }
 }
 
+// Make an empty grid
 function makeEmptyGrid(cols, rows) {
   let randomArray = [];
   for (let y = 0; y < cols; y++) {
