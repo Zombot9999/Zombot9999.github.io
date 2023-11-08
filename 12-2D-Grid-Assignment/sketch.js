@@ -20,25 +20,32 @@ let spawnLinesYTimer = 0;
 let spawnLinesXTimer = 0;
 let spawnLinesX = 0;
 let spawnLinesY = 0;
+let spawnLinesCooldown = prompt("Enter the cooldown for vertical and horizontal lines attack (Recommended to be above 4500):" , 4500); 
 
 // Variables for spawnOnPlayer() 
 let spawnPlayer = false;
 let spawnOnPlayerY = 0;
 let spawnOnPlayerX = 0;
-let spawnOnPlayerTimer = 0;
+
+// Variables for randomSpawn()
+let randomSpawnTimer = 0;
+let spawnRandom = false;
+let randomSpawnCooldown = prompt("Enter the cooldown for vertical and horizontal lines attack:" , 800);
 
 // Create canvas, set variables and make an empty grid
 function setup() {
   createCanvas(windowWidth, windowHeight);
   columns = floor(windowHeight/cellSize);
   rows = floor(windowWidth/cellSize);
+  spawnLinesCooldown = int(spawnLinesCooldown);
+  randomSpawnCooldown = int(randomSpawnCooldown);
 
   player = {
     x: 0,
     y: 0,
     size: cellSize/2,
     livesMax: 3,
-    lives: 100,
+    lives: 3,
     iFrame: false,
     iFrameTimer: 0,
     color: "cyan",
@@ -55,21 +62,62 @@ function draw() {
   spawnOnPlayer();
   spawnLinesYAxis(); 
   spawnLinesXAxis();
+  randomSpawn();
+}
+
+// Spawns a kill block in a random spot
+function randomSpawn() {
+  if (spawnRandom && millis() > randomSpawnTimer) {
+    let randomX = floor(random(0, rows));
+    let randomY = floor(random(0, columns));
+
+    if (grid[randomY][randomX] === 0) {
+      grid[randomY][randomX] = 1;
+
+      // Spawn another kill block above
+      if (randomY > 0 && grid[randomY - 1][randomX] === 0) {
+        setTimeout(() => {
+          grid[randomY - 1][randomX] = 1;
+        }, 500);
+      }
+      // Spawn another kill block to the right
+      if (randomX < rows - 1 && grid[randomY][randomX + 1] === 0) {
+        setTimeout(() => {
+          grid[randomY][randomX + 1] = 1;
+        }, 500);
+      }
+      // Spawn another kill block to the left
+      if (randomX > 0 && grid[randomY][randomX - 1] === 0) {
+        setTimeout(() => {
+          grid[randomY][randomX - 1] = 1;
+        }, 500);
+      }
+      // Spawn another kill block below
+      if (randomY < columns - 1 && grid[randomY + 1][randomX] === 0) {
+        setTimeout(() => {
+          grid[randomY + 1][randomX] = 1;
+        }, 500);
+      }
+      // Cooldown
+      randomSpawnTimer = millis() + 800;
+    }
+  }
 }
 
 // Spawns vertical lines going from top to botton in a random x spot
 function spawnLinesYAxis() {
   if (linesAttackY && millis() > spawnLinesYTimer) {
-    spawnLinesYTimer = millis() + 4500;
+    spawnLinesYTimer = millis() + spawnLinesCooldown;
     for (let lineY = 0; lineY < columns; lineY++) {
       grid[lineY][spawnLinesX] = 0; 
     }
     spawnLinesX = floor(random(0, rows));
     for (let lineY = 0; lineY < columns; lineY++) {
-      setTimeout(() => {
-        grid[lineY][spawnLinesX] = 1;
-        console.log(lineY, spawnLinesX); 
-      }, 100 * lineY);
+      if (grid[lineY][spawnLinesX] === 0) {
+        setTimeout(() => {
+          grid[lineY][spawnLinesX] = 1;
+        }, 100 * lineY);
+      }
     }
   }
 }
@@ -77,15 +125,17 @@ function spawnLinesYAxis() {
 // Spawns horizontal lines going from left to right in a random y spot
 function spawnLinesXAxis() {
   if (linesAttackX && millis() > spawnLinesXTimer) {
-    spawnLinesXTimer = millis() + 4500;
+    spawnLinesXTimer = millis() + spawnLinesCooldown;
     for (let lineX = 0; lineX < rows; lineX++) {
       grid[spawnLinesY][lineX] = 0; 
     }
     spawnLinesY = floor(random(0, columns));
     for (let lineX = 0; lineX < rows; lineX++) {
-      setTimeout(() => {
-        grid[spawnLinesY][lineX] = 1; 
-      }, 100 * lineX);
+      if (grid[spawnLinesY][lineX] === 0) {
+        setTimeout(() => {
+          grid[spawnLinesY][lineX] = 1; 
+        }, 100 * lineX);
+      }
     }
   }
 }
@@ -109,6 +159,10 @@ function gameOver() {
   textWrap(WORD);
   text("Game Over!", 5 * cellSize, 5 * cellSize, cellSize * 10, cellSize);
   player.color = "cyan";
+  linesAttackX = false;
+  linesAttackY = false;
+  spawnPlayer = false;
+  spawnRandom = false;
 }
 
 // Check if the player has died and reduce lives
@@ -178,6 +232,9 @@ function keyTyped() {
   if (key === "p") {
     spawnPlayer = !spawnPlayer;
   }
+  if (key === "r") {
+    spawnRandom = !spawnRandom;
+  }
 }
 
 // Change a block when it's clicked on
@@ -188,7 +245,7 @@ function mousePressed() {
   if (grid[y][x] === 0) {
     grid[y][x] = 1;
   }
-  else if (grid[y][x] === 4) {
+  else if (grid[y][x] === 4 || grid[y][x] === 4.5) {
     grid[y][x] = 0;
   }
 }
