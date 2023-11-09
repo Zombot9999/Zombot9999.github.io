@@ -8,10 +8,11 @@
 
 // General Variables
 let grid;
-let cellSize = 75;
+let cellSize = prompt("Enter a size for each cell:" , 75);
 let rows;
 let columns; 
 let player;
+let score = 0;
 
 // Variables for spawnLinesYAxis() and spawnLinesXAxis()
 let linesAttackY = false;
@@ -20,7 +21,7 @@ let spawnLinesYTimer = 0;
 let spawnLinesXTimer = 0;
 let spawnLinesX = 0;
 let spawnLinesY = 0;
-let spawnLinesCooldown = prompt("Enter the cooldown for vertical and horizontal lines attack (Recommended to be above 4500):" , 4500); 
+let spawnLinesCooldown = prompt("Enter the cooldown for vertical and horizontal lines attack (The bigger the cell size the bigger this number should be):" , 4500); 
 
 // Variables for spawnOnPlayer() 
 let spawnPlayer = false;
@@ -34,6 +35,7 @@ let randomSpawnCooldown = prompt("Enter the cooldown for vertical and horizontal
 
 // Create canvas, set variables and make an empty grid
 function setup() {
+  cellSize = int(cellSize);
   createCanvas(windowWidth, windowHeight);
   columns = floor(windowHeight/cellSize);
   rows = floor(windowWidth/cellSize);
@@ -65,6 +67,37 @@ function draw() {
   randomSpawn();
 }
 
+function diagonalMove(x, y, direction) {
+  let movement = true;
+  
+  for (let i = 0; i < columns && i >= 0; i++) {
+
+    if (direction === "northwest" && x < rows && x >= 0) {
+      setTimeout(() => {
+        grid[y - 1 * i][x - 1 * i] = 1;
+      }, 100 * i);
+    }
+
+    if (direction === "northeast" && x < rows && x >= 0) {
+      setTimeout(() => {
+        grid[y - 1 * i][x + 1 * i] = 1;
+      }, 100 * i);
+    }
+
+    if (direction === "southwest" && x < rows && x >= 0) {
+      setTimeout(() => {
+        grid[y + 1 * i][x - 1 * i] = 1;
+      }, 100 * i);
+    }
+
+    if (direction === "southeast" && x < rows && x >= 0) {
+      setTimeout(() => {
+        grid[y + 1 * i][x + 1 * i] = 1;
+      }, 100 * i);
+    }
+  }
+}
+
 // Spawns a kill block in a random spot
 function randomSpawn() {
   if (spawnRandom && millis() > randomSpawnTimer) {
@@ -74,32 +107,60 @@ function randomSpawn() {
     if (grid[randomY][randomX] === 0) {
       grid[randomY][randomX] = 1;
 
-      // Spawn another kill block above
-      if (randomY > 0 && grid[randomY - 1][randomX] === 0) {
+      // Spawn kill block to the north
+      if (randomY > 0) {
         setTimeout(() => {
           grid[randomY - 1][randomX] = 1;
-        }, 500);
+        }, 350);
+        // Spawn kill block to the north east
+        if (randomX < rows - 1) {
+          setTimeout(() => {
+            grid[randomY - 1][randomX + 1] = 1;
+            diagonalMove(randomX, randomY, "northeast");
+          }, 700);
+        }
+        // Spawn kill block to the north west
+        if (randomX > 0) {
+          setTimeout(() => {
+            grid[randomY - 1][randomX - 1] = 1;
+            diagonalMove(randomX, randomY, "northwest");
+          }, 700);
+        }
       }
-      // Spawn another kill block to the right
-      if (randomX < rows - 1 && grid[randomY][randomX + 1] === 0) {
+      // Spawn another kill block to the east area
+      if (randomX < rows - 1) {
         setTimeout(() => {
           grid[randomY][randomX + 1] = 1;
-        }, 500);
+        }, 300);
       }
-      // Spawn another kill block to the left
-      if (randomX > 0 && grid[randomY][randomX - 1] === 0) {
+      // Spawn another kill block to the west area
+      if (randomX > 0) {
         setTimeout(() => {
           grid[randomY][randomX - 1] = 1;
-        }, 500);
+        }, 300);
       }
-      // Spawn another kill block below
-      if (randomY < columns - 1 && grid[randomY + 1][randomX] === 0) {
+      // Spawn kill block to the south
+      if (randomY < columns - 1) {
         setTimeout(() => {
           grid[randomY + 1][randomX] = 1;
-        }, 500);
+        }, 300);
+        // Spawn kill block to the south east
+        if (randomX < rows - 1) {
+          setTimeout(() => {
+            grid[randomY + 1][randomX + 1] = 1;
+            diagonalMove(randomX, randomY, "southeast");
+          }, 700);
+        }
+        // Spawn kill block to the south west
+        if (randomX > 0) {
+          setTimeout(() => {
+            grid[randomY + 1][randomX - 1] = 1;
+            diagonalMove(randomX, randomY, "southwest");
+          }, 700);
+        }
       }
       // Cooldown
-      randomSpawnTimer = millis() + 800;
+      randomSpawnTimer = millis() + randomSpawnCooldown;
     }
   }
 }
@@ -154,10 +215,12 @@ function spawnOnPlayer() {
 
 // Display game over
 function gameOver() {
-  textSize(750/columns);
+  textSize(100);
   fill("white");
   textWrap(WORD);
-  text("Game Over!", 5 * cellSize, 5 * cellSize, cellSize * 10, cellSize);
+  text("Game Over!", windowWidth/2, windowHeight/2);
+  fill("green");
+  text(score, windowWidth/2, windowHeight/2 + 100);
   player.color = "cyan";
   linesAttackX = false;
   linesAttackY = false;
@@ -179,6 +242,9 @@ function livesSystem() {
   if (millis() > player.iFrameTimer) {
     player.iFrame = false;
     player.color = "cyan";
+  }
+  if (player.lives > 0) {
+    score = floor(millis() / 100);
   }
 }
 
