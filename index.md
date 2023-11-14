@@ -12,6 +12,7 @@
 - [Game of Life](11-game-of-life)
 - [Character in Grid](13-character-in-grid)
 - [Dog OOP Demo](14-dog-oop)
+- [Walker OOP Demo](15-walker-oop)
 
 ## Projects
 - [Interactive Scene](02-Scene)
