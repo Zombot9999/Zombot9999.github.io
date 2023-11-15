@@ -13,6 +13,7 @@
 - [Character in Grid](13-character-in-grid)
 - [Dog OOP Demo](14-dog-oop)
 - [Walker OOP Demo](15-walker-oop)
+- [Ball OOP Demo](16-ball-oop)
 
 ## Projects
 - [Interactive Scene](02-Scene)
