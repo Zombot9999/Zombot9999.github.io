@@ -73,7 +73,7 @@ function draw() {
 
 function mousePressed() {
   for (let i = 0; i <= 0; i++) {
-    let newBall = new Ball(mouseX, mouseY);
+    let newBall = new Ball(random(width), random(height));
     ballArray.push(newBall);
   }
 }
