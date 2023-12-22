@@ -18,6 +18,7 @@
 - [Fireworks OOP Demo](18-fireworks)
 - [Inheritance OOP Demo](19-inheritance)
 - [Collision Demo](20-collision)
+- [Recursive Circles](23-circle-recursion)
 
 ## Projects
 - [Interactive Scene](02-Scene)
